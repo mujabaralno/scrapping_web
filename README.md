@@ -1,103 +1,98 @@
 <div align="center">
 
-<img src="https://www.google.com/search?q=https://cdn-icons-png.flaticon.com/512/8149/8149182.png" alt="Logo Project" width="120" height="120">
+# AI Web Scraper & Job Analyzer
 
-AI Web Scraper & Job Analyzer
+**Ekstraksi Data Cerdas, Analisis Otomatis, dan Pengujian Terintegrasi**
 
-Ekstraksi Data Cerdas, Analisis Otomatis, dan Pengujian Terintegrasi
+![Next.js](https://img.shields.io/badge/Next.js-16%2F19-black?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue?style=for-the-badge&logo=typescript&logoColor=white)
+![Playwright](https://img.shields.io/badge/Playwright-E2E-green?style=for-the-badge&logo=playwright)
 
-<p align="center">
-<a href="#-tentang-proyek">Tentang</a> •
-<a href="#-fitur-unggulan">Fitur</a> •
-<a href="#-struktur-proyek">Struktur</a> •
-<a href="#-tech-stack">Teknologi</a> •
-<a href="#-cara-instalasi">Instalasi</a>
-</p>
+
 </div>
 
-📖 Tentang Proyek
+---
 
-AI Web Scraper adalah platform modern yang dirancang untuk melakukan scraping data web secara otomatis dan cerdas. Menggunakan teknologi Firecrawl AI untuk ekstraksi konten yang bersih dan Google Gemini AI untuk analisis data, aplikasi ini mampu mengubah website yang tidak terstruktur menjadi informasi yang berharga.
+## 📖 Tentang Proyek
 
-Proyek ini tidak hanya fokus pada fungsionalitas, tetapi juga pada kualitas kode dengan implementasi End-to-End Testing menggunakan Playwright yang terintegrasi langsung dengan management tool Qase.io.
+**AI Web Scraper & Job Analyzer** adalah platform modern berbasis **Next.js** yang dirancang untuk melakukan **web scraping otomatis menggunakan AI** dan **analisis data terstruktur**.  
+Aplikasi ini mampu mengubah website yang tidak terstruktur menjadi informasi bernilai tinggi secara efisien dan scalable.
 
-🎮 Fitur Unggulan
+Proyek ini memanfaatkan **Firecrawl AI** untuk ekstraksi konten bersih serta **Google Gemini AI** untuk analisis data. Selain fokus pada fitur utama, proyek ini juga menekankan **kualitas kode dan keandalan sistem** melalui **End-to-End Testing (E2E)** menggunakan **Playwright** yang terintegrasi langsung dengan **Qase TestOps**.
 
-🤖 1. Intelligent AI Scraping
+---
 
-Sistem pemindaian web yang tidak hanya mengambil teks, tetapi memahami struktur konten menggunakan LLM.
+## 🎮 Fitur Unggulan
 
-Logika: lib/firecrawl.ts & app/api/scrapingjob/route.ts
+### 🤖 1. Intelligent AI Scraping
+Sistem scraping cerdas yang tidak hanya mengambil teks mentah, tetapi juga **memahami struktur dan konteks konten website** menggunakan Large Language Model (LLM).
 
-Cara Kerja: Mengekstrak data dari URL dan memvalidasi hasilnya menggunakan skema yang ditentukan di lib/job-validator.ts dengan dukungan Firecrawl SDK.
+- **Core Logic**: `lib/firecrawl.ts`, `app/api/scrapingjob/route.ts`
+- **Cara Kerja**:  
+  URL diproses oleh Firecrawl SDK → data diekstraksi → divalidasi menggunakan skema di `lib/job-validator.ts`.
 
-🔐 2. Enterprise Authentication
+---
 
+### 🔐 2. Enterprise Authentication
 Keamanan tingkat tinggi untuk melindungi data hasil scraping.
 
-Provider: Menggunakan Clerk untuk manajemen user.
+- **Auth Provider**: Clerk
+- **Flow**:  
+  Akses publik (Landing Page) dipisahkan dari halaman terautentikasi (Crawl Page) menggunakan middleware Clerk.
+- **Benefit**:  
+  Kontrol akses yang aman dan terstruktur untuk setiap pengguna.
 
-Interaksi: Memisahkan akses antara pengunjung (LandingPage) dan pengguna terautentikasi (CrawlPage) melalui middleware Clerk.
+---
 
-📊 3. Database & Job Management
+### 📊 3. Database & Job Management
+Penyimpanan data hasil scraping secara **persisten dan terorganisir**.
 
-Penyimpanan data hasil scraping yang persisten dan terstruktur.
+- **Database**: MongoDB
+- **ORM**: Mongoose
+- **Schema**: `datajobs.model.ts`
+- **API**:  
+  Endpoint `/api/jobs` untuk manajemen data lowongan kerja secara real-time.
 
-ORM: Mongoose dengan skema datajobs.model.ts.
+---
 
-API: Endpoint /api/jobs untuk manajemen data lowongan kerja secara real-time yang tersimpan di MongoDB.
+### 🧪 4. Automated Quality Assurance (Qase Integration)
+Pengujian otomatis yang terintegrasi langsung dengan Test Management System.
 
-🧪 4. Automated QA (Qase Integration)
+- **Framework**: Playwright
+- **Skenario**: Login, logout, dan pengambilan data (E2E)
+- **Reporting**:  
+  `playwright-qase-reporter` untuk sinkronisasi hasil tes ke **Qase TestOps Dashboard**.
 
-Pengujian otomatis yang melaporkan hasil langsung ke dashboard manajemen tes (TestOps).
+---
 
-Testing: Playwright untuk skenario login, logout, dan pengambilan data secara otomatis.
+## 📂 Struktur Proyek
 
-Reporting: Integrasi playwright-qase-reporter untuk sinkronisasi hasil tes secara otomatis ke Qase.io.
+Struktur folder utama untuk menjaga kode tetap modular dan mudah dikembangkan:
 
-📂 Struktur Proyek
-
-Peta folder utama untuk memudahkan navigasi pengembangan:
-
+```bash
 res://
-├── 📂 app/               # Next.js App Router (Pages & API Routes)
-├── 📂 components/        # UI Components (Landing, Scraping, Shared)
-├── 📂 lib/               # Business Logic, Database Config, & AI Tools
-│   ├── 📂 database/      # Mongoose Models & Connection
-│   └── 📜 firecrawl.ts   # AI Scraping Configuration
-├── 📂 tests/             # Playwright E2E Test Scripts
-├── 📜 next.config.ts     # Konfigurasi Next.js
-└── 📜 playwright.config.ts # Konfigurasi Testing & Qase Reporter
+├── app/                     # Next.js App Router (Pages & API Routes)
+├── components/              # UI Components (Landing, Scraping, Shared)
+├── lib/                     # Business Logic, Database, & AI Tools
+│   ├── database/            # Mongoose Models & DB Connection
+│   └── firecrawl.ts         # AI Scraping Configuration
+├── tests/                   # Playwright End-to-End Tests
+├── next.config.ts           # Next.js Configuration
+└── playwright.config.ts     # Playwright & Qase Reporter Configuration
+---
+```
 
-
-🛠️ Tech Stack
-
-Aplikasi ini dibangun menggunakan ekosistem teknologi terbaru untuk performa maksimal:
-
-Core: Next.js 16/19, React 19, TypeScript.
-
-Styling: Tailwind CSS 4, Framer Motion, GSAP.
-
-AI & SDK: Google Generative AI (@ai-sdk/google), Firecrawl JS.
-
-Backend: MongoDB (Mongoose), Clerk Auth.
-
-QA: Playwright, Qase TestOps.
-
-⚙️ Cara Instalasi
-
-1. Clone & Install
-
-git clone [https://github.com/username/project.git](https://github.com/username/project.git)
+## ⚙️ Cara Instalasi
+# 1️⃣ Clone Repository & Install Dependency
+```
+git clone https://github.com/username/project.git](https://github.com/mujabaralno/scrapping_web
 cd project
 npm install
-
-
-2. Konfigurasi Environment
-
-Buat file .env.local dan lengkapi variabel berikut:
-
-# Clerk
+```
+# 2️⃣ Konfigurasi Environment
+```
+Buat file .env.local dan isi variabel berikut:
+# Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 
@@ -108,24 +103,20 @@ GOOGLE_GENERATIVE_AI_API_KEY=
 # Database
 MONGODB_URI=
 
-# Testing (Qase.io)
+# Testing (Qase TestOps)
 QASE_TESTOPS_API_TOKEN=
 QASE_TESTOPS_PROJECT=
 
-# CLERK ACCOUNT
+# Test Account (E2E)
 USERNAME_LOGIN=
 PASSWORD_LOGIN=
+```
 
-
-3. Menjalankan Aplikasi
-
-# Development mode
+# 3️⃣ Menjalankan Aplikasi
+```
+# Development Mode
 npm run dev
-
-# Menjalankan pengujian
+# Menjalankan Automated Test
 npx playwright test
+```
 
-
-<div align="center">
-<p>Dibuat dengan dedikasi untuk efisiensi data.</p>
-</div>
