@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "test/job.test.tsddd"  ],
   "exclude": ["node_modules"]
 }

@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/database";
 import DataJob from "@/lib/database/models/datajobs.model";
-import FirecrawlApp from "@mendable/firecrawl-js"; // Pastikan import ini benar sesuai versi SDK mu
+import FirecrawlApp from "@mendable/firecrawl-js";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { z } from "zod";
@@ -68,25 +68,37 @@ export async function POST(req: Request) {
       model: gemini("gemini-2.5-flash"),
       schema: schema,
       prompt: `
-        You are an expert Data Engineer. 
-        Extract ALL job listings from the provided raw markdown below.
-        
-        RULES:
-        1. Ignore navigation links, footers, login buttons, and generic site text.
-        2. Focus strictly on the list of jobs.
-        3. If requirements are truncated, just take what is visible.
-        4. "label_skill" should be comma-separated keywords found in the text (e.g., "React, Node.js").
-        
-        RAW MARKDOWN:
-        ${scrapeRes.markdown}
-      `,
+You are an expert Data Engineer and Data Cleaner.
+Extract job listings from the raw markdown provided below.
+
+Your MAIN GOAL is to produce a clean, high-quality dataset ready for "Association Rule Mining" analysis.
+
+### INSTRUCTIONS:
+1. **Scope:** Ignore navigation, footers, and general site text. Focus ONLY on job cards/listings.
+2. **Truncation:** If text is cut off, capture only what is visible.
+
+### CRITICAL RULES FOR "label_skill" (CLEANING RULES):
+You must normalize and clean the skills *before* outputting them.
+1. **Normalization (Canonicalization):** Standardize tech stack names.
+   - "ReactJS", "React.js", "React JS" -> MUST become "React"
+   - "NodeJS", "Node.js" -> MUST become "Node.js"
+   - "Golang" -> MUST become "Go"
+   - "Amazon Web Services", "AWS Cloud" -> MUST become "AWS"
+2. **Hard Skills Only:** Extract only TECHNICAL skills (Languages, Frameworks, Databases, Tools).
+   - IGNORE soft skills like "Communication", "Leadership", "Teamwork".
+3. **Exclusion List (Blacklist):** DO NOT include job title words or generic terms as skills.
+   - REMOVE: "Engineer", "Developer", "Senior", "Junior", "Full Stack", "Backend", "Frontend", "Manager", "Lead", "Consultant", "Remote", "Hybrid", "On-site".
+  - DONT USE ARRAY SIMBOL IN label_skill, dont like this "[]" 
+4. SANGAT PENTING: JANGAN KOSONGKAN ATRIBUT label_skill, TOLONG BACA requirement_text dengan benar!!!!!!!!
+5. Dilabel Skill jangan tulis seperti Programming, Machine Learning, dll, tulis tech stack apa saja yang dibutuhkan di requirement_text jobnyaa!!!
+### RAW MARKDOWN INPUT:
+${scrapeRes.markdown}
+`,
     });
 
     // DEBUG: Cek apa yang Gemini temukan
     console.log(`🤖 Gemini menemukan ${cleanedData.listings.length} data.`);
-
-    // [FIX 1] Akses langsung .listings (karena schema kita ada di root object)
-    // Jangan pakai .extract.listings, itu format Firecrawl native, bukan Vercel AI SDK.
+    
     const jobList = cleanedData.listings;
 
     if (jobList.length === 0) {
@@ -103,12 +115,8 @@ export async function POST(req: Request) {
       location: job.location,
       requirements_text: job.requirements_text || "Lihat detail di link",
       label_skill: job.label_skill || "",
-      // Jika AI dapat link spesifik, simpan. Jika tidak, pakai URL list page
       url_lowongan: job.url_lowongan || url, 
     }));
-
-    // [FIX 2] EKSEKUSI SIMPAN KE DB (PENTING!)
-    // Kamu sebelumnya lupa baris ini, makanya DB kosong.
     await DataJob.insertMany(jobsToSave);
 
     console.log(`✅ Berhasil menyimpan ${jobsToSave.length} lowongan ke DB.`);
